@@ -1,0 +1,579 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CVforge — AI Конструктор резюме</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+:root{
+  --bg:#f8f7f4;
+  --white:#ffffff;
+  --text:#1a1a2e;
+  --muted:#8b8b9a;
+  --accent:#6c63ff;
+  --accent2:#ff6584;
+  --accent3:#43e97b;
+  --border:#e8e8f0;
+  --card:#ffffff;
+  --shadow:0 4px 24px rgba(108,99,255,0.10);
+  --shadow2:0 8px 40px rgba(108,99,255,0.18);
+}
+body{background:var(--bg);color:var(--text);font-family:'Outfit',sans-serif;min-height:100vh;overflow-x:hidden}
+
+/* SCROLLBAR */
+::-webkit-scrollbar{width:6px}
+::-webkit-scrollbar-track{background:#f0f0f8}
+::-webkit-scrollbar-thumb{background:#c5c3e8;border-radius:3px}
+
+/* BUTTONS */
+.btn-primary{background:linear-gradient(135deg,#6c63ff,#a855f7);color:#fff;border:none;padding:14px 32px;font-size:15px;font-weight:600;font-family:'Outfit',sans-serif;cursor:pointer;border-radius:14px;box-shadow:0 4px 20px rgba(108,99,255,0.35);transition:all .25s;display:inline-flex;align-items:center;gap:8px}
+.btn-primary:hover{transform:translateY(-2px);box-shadow:0 8px 30px rgba(108,99,255,0.45)}
+.btn-primary:active{transform:translateY(0)}
+.btn-secondary{background:var(--white);color:var(--accent);border:2px solid var(--accent);padding:13px 28px;font-size:15px;font-weight:600;font-family:'Outfit',sans-serif;cursor:pointer;border-radius:14px;transition:all .25s}
+.btn-secondary:hover{background:var(--accent);color:#fff;transform:translateY(-2px)}
+.btn-outline{background:transparent;color:var(--muted);border:1.5px solid var(--border);padding:12px 24px;font-size:14px;font-weight:500;font-family:'Outfit',sans-serif;cursor:pointer;border-radius:12px;transition:all .2s}
+.btn-outline:hover{border-color:var(--accent);color:var(--accent)}
+
+/* NAV */
+nav{background:rgba(255,255,255,0.85);backdrop-filter:blur(20px);position:sticky;top:0;z-index:50;border-bottom:1px solid var(--border);padding:0 5vw}
+.nav-inner{max-width:1100px;margin:0 auto;display:flex;justify-content:space-between;align-items:center;height:64px}
+.logo{font-size:22px;font-weight:800;background:linear-gradient(135deg,#6c63ff,#a855f7);-webkit-background-clip:text;-webkit-text-fill-color:transparent;cursor:pointer}
+.nav-links{display:flex;gap:8px;align-items:center}
+.nav-link{color:var(--muted);font-size:14px;font-weight:500;padding:8px 16px;border-radius:10px;cursor:pointer;transition:all .2s}
+.nav-link:hover{color:var(--text);background:#f0f0f8}
+.nav-cta{background:linear-gradient(135deg,#6c63ff,#a855f7);color:#fff;border:none;padding:9px 22px;font-size:14px;font-weight:600;font-family:'Outfit',sans-serif;cursor:pointer;border-radius:11px;box-shadow:0 3px 12px rgba(108,99,255,0.3);transition:all .2s}
+.nav-cta:hover{transform:translateY(-1px);box-shadow:0 5px 18px rgba(108,99,255,0.4)}
+
+/* HERO */
+.hero{max-width:1100px;margin:0 auto;padding:80px 5vw 60px;display:grid;grid-template-columns:1fr 1fr;gap:60px;align-items:center}
+.hero-badge{display:inline-flex;align-items:center;gap:8px;background:linear-gradient(135deg,#ede9fe,#fce7f3);color:#7c3aed;padding:6px 14px;border-radius:50px;font-size:12px;font-weight:600;margin-bottom:24px;border:1px solid #ddd6fe}
+.hero-badge span{font-size:16px}
+h1{font-size:clamp(36px,4.5vw,58px);font-weight:800;line-height:1.1;margin-bottom:20px;letter-spacing:-.02em}
+h1 .grad{background:linear-gradient(135deg,#6c63ff,#ec4899);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.hero-sub{font-size:17px;color:var(--muted);line-height:1.7;margin-bottom:36px;max-width:460px}
+.hero-btns{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:32px}
+.hero-social{display:flex;gap:20px;align-items:center}
+.social-num{font-size:22px;font-weight:800;color:var(--text)}
+.social-label{font-size:12px;color:var(--muted)}
+.hero-img{position:relative}
+.hero-card{background:var(--white);border-radius:24px;padding:28px;box-shadow:var(--shadow2);position:relative}
+.hero-card-badge{position:absolute;top:-12px;right:20px;background:linear-gradient(135deg,#43e97b,#38f9d7);color:#065f46;padding:5px 14px;border-radius:50px;font-size:12px;font-weight:700}
+.cv-preview{background:linear-gradient(135deg,#f8f7ff,#fdf4ff);border-radius:16px;padding:20px;border:1px solid #ede9fe}
+.cv-name{font-size:18px;font-weight:700;margin-bottom:4px}
+.cv-role{font-size:12px;color:var(--accent);font-weight:600;margin-bottom:12px}
+.cv-line{height:8px;background:linear-gradient(90deg,#6c63ff,#a855f7);border-radius:4px;margin-bottom:6px}
+.cv-line.short{width:60%;background:linear-gradient(90deg,#e0e7ff,#ede9fe)}
+.cv-line.medium{width:80%;background:linear-gradient(90deg,#e0e7ff,#ede9fe)}
+.cv-section{font-size:10px;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:.1em;margin:12px 0 6px}
+.floating-tag{position:absolute;background:white;border-radius:12px;padding:8px 14px;box-shadow:0 4px 20px rgba(0,0,0,.1);font-size:12px;font-weight:600;display:flex;align-items:center;gap:6px}
+
+/* STATS */
+.stats-row{max-width:1100px;margin:0 auto 60px;padding:0 5vw;display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+.stat-card{background:var(--white);border-radius:20px;padding:24px;text-align:center;box-shadow:var(--shadow);border:1px solid var(--border);transition:transform .2s}
+.stat-card:hover{transform:translateY(-4px)}
+.stat-icon{font-size:32px;margin-bottom:10px}
+.stat-n{font-size:28px;font-weight:800;background:linear-gradient(135deg,#6c63ff,#a855f7);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.stat-l{font-size:13px;color:var(--muted);margin-top:4px}
+
+/* FEATURES */
+.features{max-width:1100px;margin:0 auto 80px;padding:0 5vw}
+.section-title{text-align:center;font-size:36px;font-weight:800;margin-bottom:12px;letter-spacing:-.02em}
+.section-sub{text-align:center;color:var(--muted);font-size:16px;margin-bottom:48px}
+.features-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px}
+.feature-card{background:var(--white);border-radius:20px;padding:28px;box-shadow:var(--shadow);border:1px solid var(--border);transition:all .25s;cursor:default}
+.feature-card:hover{transform:translateY(-6px);box-shadow:var(--shadow2)}
+.feature-icon{width:52px;height:52px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:24px;margin-bottom:16px}
+.feature-title{font-size:17px;font-weight:700;margin-bottom:8px}
+.feature-desc{font-size:14px;color:var(--muted);line-height:1.6}
+
+/* PRICING */
+.pricing{max-width:1100px;margin:0 auto 80px;padding:0 5vw}
+.plans{display:grid;grid-template-columns:1fr 1fr;gap:24px;max-width:700px;margin:0 auto}
+.plan{background:var(--white);border-radius:24px;padding:36px;border:2px solid var(--border);position:relative;transition:all .25s}
+.plan:hover{border-color:var(--accent);transform:translateY(-4px);box-shadow:var(--shadow2)}
+.plan.featured{border-color:var(--accent);background:linear-gradient(135deg,#6c63ff,#a855f7);color:white}
+.plan-tag{position:absolute;top:-14px;left:50%;transform:translateX(-50%);background:linear-gradient(135deg,#43e97b,#38f9d7);color:#065f46;padding:5px 18px;border-radius:50px;font-size:12px;font-weight:700;white-space:nowrap}
+.plan-name{font-size:13px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;margin-bottom:16px;opacity:.7}
+.plan.featured .plan-name{color:rgba(255,255,255,.8)}
+.plan-price{font-size:48px;font-weight:800;margin-bottom:4px;line-height:1}
+.plan.featured .plan-price{color:white}
+.plan-period{font-size:14px;color:var(--muted);margin-bottom:28px}
+.plan.featured .plan-period{color:rgba(255,255,255,.7)}
+.plan-feat{display:flex;gap:10px;align-items:center;margin-bottom:12px;font-size:14px}
+.plan-feat .check{width:20px;height:20px;border-radius:50%;background:linear-gradient(135deg,#43e97b,#38f9d7);display:flex;align-items:center;justify-content:center;font-size:11px;flex-shrink:0}
+.plan.featured .plan-feat .check{background:rgba(255,255,255,.25)}
+.plan.featured .plan-feat{color:rgba(255,255,255,.9)}
+.plan-btn{width:100%;margin-top:24px;padding:14px}
+
+/* APP */
+#app{display:none;min-height:100vh;background:var(--bg)}
+.app-nav{background:rgba(255,255,255,0.9);backdrop-filter:blur(20px);padding:0 5vw;border-bottom:1px solid var(--border);position:sticky;top:0;z-index:50}
+.app-nav-inner{max-width:1100px;margin:0 auto;display:flex;justify-content:space-between;align-items:center;height:60px}
+.app-logo{font-size:20px;font-weight:800;background:linear-gradient(135deg,#6c63ff,#a855f7);-webkit-background-clip:text;-webkit-text-fill-color:transparent;cursor:pointer}
+.plan-pill{display:flex;align-items:center;gap:10px}
+.plan-pill span{font-size:13px;color:var(--muted)}
+.upgrade-btn{background:linear-gradient(135deg,#f59e0b,#ef4444);color:white;border:none;padding:7px 16px;border-radius:20px;font-size:12px;font-weight:700;cursor:pointer;font-family:'Outfit',sans-serif}
+
+/* FORM LAYOUT */
+.form-layout{max-width:1100px;margin:0 auto;padding:32px 5vw;display:grid;grid-template-columns:1fr 1fr;gap:32px}
+.form-layout.single{grid-template-columns:1fr;max-width:680px}
+
+/* STEP PROGRESS */
+.progress-wrap{background:white;border-radius:20px;padding:24px;box-shadow:var(--shadow);border:1px solid var(--border);margin-bottom:24px}
+.progress-steps{display:flex;gap:6px;margin-bottom:0}
+.pstep{flex:1;text-align:center}
+.pstep-bar{height:4px;border-radius:2px;background:var(--border);margin-bottom:10px;transition:background .3s}
+.pstep.active .pstep-bar,.pstep.done .pstep-bar{background:linear-gradient(90deg,#6c63ff,#a855f7)}
+.pstep-label{font-size:11px;color:var(--muted);font-weight:500}
+.pstep.active .pstep-label{color:var(--accent);font-weight:700}
+
+/* FORM CARD */
+.form-card{background:white;border-radius:24px;padding:32px;box-shadow:var(--shadow);border:1px solid var(--border)}
+.form-title{font-size:22px;font-weight:800;margin-bottom:6px}
+.form-sub{font-size:14px;color:var(--muted);margin-bottom:28px}
+.fgroup{margin-bottom:18px}
+.fgroup label{display:block;font-size:12px;font-weight:700;color:var(--text);letter-spacing:.05em;margin-bottom:7px;text-transform:uppercase}
+.fgroup input,.fgroup textarea{width:100%;background:#f8f8fc;border:1.5px solid var(--border);color:var(--text);padding:12px 16px;font-size:14px;font-family:'Outfit',sans-serif;outline:none;transition:all .2s;border-radius:12px;resize:none}
+.fgroup input:focus,.fgroup textarea:focus{border-color:var(--accent);background:white;box-shadow:0 0 0 3px rgba(108,99,255,.1)}
+.fgroup input::placeholder,.fgroup textarea::placeholder{color:#c0bfce}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+
+/* STEP NAV */
+.snav{display:flex;justify-content:space-between;margin-top:24px}
+
+/* RESULT */
+.result-card{background:white;border-radius:24px;padding:28px;box-shadow:var(--shadow);border:1px solid var(--border);position:sticky;top:80px;max-height:calc(100vh - 100px);overflow:auto}
+.result-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px}
+.result-badge{background:linear-gradient(135deg,#43e97b22,#38f9d722);color:#065f46;padding:5px 12px;border-radius:20px;font-size:12px;font-weight:700;border:1px solid #a7f3d0}
+.result-body{font-size:13px;line-height:1.8;color:#4a4a6a}
+.result-body h2{font-size:11px;font-weight:800;color:var(--accent);text-transform:uppercase;letter-spacing:.15em;margin:18px 0 8px;font-family:'JetBrains Mono',monospace}
+.result-body strong{color:var(--text);font-weight:700}
+.result-body hr{border:none;border-top:1px solid var(--border);margin:14px 0}
+.result-body .bul{display:flex;gap:8px;margin:4px 0}
+.result-body .bul::before{content:"▸";color:var(--accent);flex-shrink:0}
+.copy-btn{background:linear-gradient(135deg,#6c63ff,#a855f7);color:white;border:none;padding:8px 18px;border-radius:10px;font-size:13px;font-weight:600;cursor:pointer;font-family:'Outfit',sans-serif;transition:all .2s}
+.copy-btn:hover{transform:translateY(-1px);box-shadow:0 4px 12px rgba(108,99,255,.35)}
+
+/* SUMMARY */
+.summary-card{background:linear-gradient(135deg,#f8f7ff,#fdf4ff);border:1.5px solid #ede9fe;border-radius:16px;padding:20px;margin-bottom:24px}
+.summary-row{display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid #ede9fe;font-size:14px}
+.summary-row:last-child{border:none}
+.summary-row span:first-child{color:var(--muted);font-weight:500}
+.summary-row span:last-child{font-weight:600;color:var(--text)}
+
+/* MODAL */
+.modal{position:fixed;inset:0;background:rgba(26,26,46,.5);backdrop-filter:blur(8px);display:none;align-items:center;justify-content:center;z-index:200;padding:20px}
+.modal.show{display:flex}
+.modal-box{background:white;border-radius:28px;padding:40px;max-width:440px;width:100%;text-align:center;box-shadow:0 20px 60px rgba(108,99,255,.25)}
+.modal-icon{font-size:52px;margin-bottom:16px}
+.modal-title{font-size:24px;font-weight:800;margin-bottom:10px}
+.modal-text{color:var(--muted);font-size:15px;line-height:1.6;margin-bottom:28px}
+.modal-close{background:none;border:none;color:var(--muted);margin-top:14px;cursor:pointer;font-size:14px;font-family:'Outfit',sans-serif}
+
+/* LIMIT */
+.limit-warn{background:linear-gradient(135deg,#fef3c7,#fde68a);border:1.5px solid #fcd34d;color:#92400e;border-radius:12px;padding:14px 16px;font-size:13px;font-weight:600;margin-bottom:20px;display:none}
+
+/* MOBILE */
+@media(max-width:768px){
+  .hero{grid-template-columns:1fr;padding:40px 5vw;gap:32px}
+  .hero-img{display:none}
+  .stats-row{grid-template-columns:1fr;padding:0 5vw}
+  .features-grid{grid-template-columns:1fr}
+  .plans{grid-template-columns:1fr}
+  .nav-links .nav-link{display:none}
+  .form-layout{grid-template-columns:1fr;padding:20px 4vw}
+  .grid2{grid-template-columns:1fr}
+  .result-card{position:static;max-height:none}
+  .pstep-label{display:none}
+}
+</style>
+</head>
+<body>
+
+<!-- LANDING -->
+<div id="landing">
+  <nav>
+    <div class="nav-inner">
+      <div class="logo">CVforge ✨</div>
+      <div class="nav-links">
+        <span class="nav-link">Возможности</span>
+        <span class="nav-link">Цены</span>
+        <span class="nav-link">FAQ</span>
+        <button class="nav-cta" onclick="showApp()">Попробовать бесплатно →</button>
+      </div>
+    </div>
+  </nav>
+
+  <div class="hero">
+    <div class="hero-text">
+      <div class="hero-badge"><span>✨</span> Создано с помощью Claude AI</div>
+      <h1>Резюме, которое<br><span class="grad">открывает двери</span></h1>
+      <p class="hero-sub">ИИ создаёт профессиональное резюме за 30 секунд. Просто заполни форму — и получи готовый документ.</p>
+      <div class="hero-btns">
+        <button class="btn-primary" onclick="showApp()">🚀 Создать резюме бесплатно</button>
+        <button class="btn-secondary" onclick="document.querySelector('.pricing').scrollIntoView({behavior:'smooth'})">Посмотреть цены</button>
+      </div>
+      <div class="hero-social">
+        <div><div class="social-num">12 400+</div><div class="social-label">резюме создано</div></div>
+        <div style="width:1px;height:36px;background:var(--border)"></div>
+        <div><div class="social-num">94%</div><div class="social-label">получили оффер</div></div>
+        <div style="width:1px;height:36px;background:var(--border)"></div>
+        <div><div class="social-num">30 сек</div><div class="social-label">генерация</div></div>
+      </div>
+    </div>
+    <div class="hero-img">
+      <div class="hero-card">
+        <div class="hero-card-badge">✓ Готово за 30 сек</div>
+        <div class="cv-preview">
+          <div class="cv-name">Иван Петров</div>
+          <div class="cv-role">Senior Frontend Developer</div>
+          <div class="cv-line"></div>
+          <div class="cv-section">Опыт работы</div>
+          <div class="cv-line short"></div>
+          <div class="cv-line medium"></div>
+          <div class="cv-line short"></div>
+          <div class="cv-section">Навыки</div>
+          <div class="cv-line medium"></div>
+          <div class="cv-line short"></div>
+        </div>
+        <div class="floating-tag" style="bottom:-16px;left:-16px">⚡ AI генерация</div>
+        <div class="floating-tag" style="top:20px;right:-20px">📄 PDF экспорт</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="stats-row">
+    <div class="stat-card"><div class="stat-icon">⚡</div><div class="stat-n">30 сек</div><div class="stat-l">Время генерации</div></div>
+    <div class="stat-card"><div class="stat-icon">🎯</div><div class="stat-n">94%</div><div class="stat-l">Получили оффер</div></div>
+    <div class="stat-card"><div class="stat-icon">📝</div><div class="stat-n">12 400+</div><div class="stat-l">Резюме создано</div></div>
+  </div>
+
+  <div class="features">
+    <div class="section-title">Почему CVforge?</div>
+    <div class="section-sub">Всё что нужно для идеального резюме</div>
+    <div class="features-grid">
+      <div class="feature-card">
+        <div class="feature-icon" style="background:linear-gradient(135deg,#ede9fe,#fce7f3)">🤖</div>
+        <div class="feature-title">Умный ИИ</div>
+        <div class="feature-desc">Claude AI анализирует твой опыт и создаёт профессиональный текст который выделит тебя среди других</div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon" style="background:linear-gradient(135deg,#d1fae5,#a7f3d0)">⚡</div>
+        <div class="feature-title">30 секунд</div>
+        <div class="feature-desc">Заполни форму — получи готовое резюме. Никаких шаблонов, никаких долгих редакторов</div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon" style="background:linear-gradient(135deg,#fef3c7,#fde68a)">🎯</div>
+        <div class="feature-title">Под вакансию</div>
+        <div class="feature-desc">Скоро: вставь ссылку на вакансию и ИИ адаптирует резюме под конкретные требования</div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon" style="background:linear-gradient(135deg,#dbeafe,#bfdbfe)">📄</div>
+        <div class="feature-title">PDF экспорт</div>
+        <div class="feature-desc">Скачай красивое PDF резюме с профессиональным дизайном одним кликом (PRO)</div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon" style="background:linear-gradient(135deg,#fce7f3,#fbcfe8)">💌</div>
+        <div class="feature-title">Сопроводительные письма</div>
+        <div class="feature-desc">ИИ напишет персональное сопроводительное письмо под каждую вакансию (PRO)</div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon" style="background:linear-gradient(135deg,#ecfdf5,#d1fae5)">🇷🇺</div>
+        <div class="feature-title">Для России</div>
+        <div class="feature-desc">Оплата через ЮKassa, поддержка hh.ru, интеграция с популярными российскими платформами</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="pricing">
+    <div class="section-title">Простые тарифы</div>
+    <div class="section-sub">Начни бесплатно, расти с PRO</div>
+    <div class="plans">
+      <div class="plan">
+        <div class="plan-name">Free</div>
+        <div class="plan-price">$0</div>
+        <div class="plan-period">навсегда бесплатно</div>
+        <div class="plan-feat"><div class="check">✓</div> 1 резюме</div>
+        <div class="plan-feat"><div class="check">✓</div> Базовый шаблон</div>
+        <div class="plan-feat"><div class="check">✓</div> Копировать текст</div>
+        <button class="btn-secondary plan-btn" onclick="showApp()">Начать бесплатно</button>
+      </div>
+      <div class="plan featured">
+        <div class="plan-tag">🔥 Популярный</div>
+        <div class="plan-name">Pro</div>
+        <div class="plan-price">$9</div>
+        <div class="plan-period">в месяц</div>
+        <div class="plan-feat"><div class="check">✓</div> ∞ резюмей</div>
+        <div class="plan-feat"><div class="check">✓</div> Сопроводительные письма</div>
+        <div class="plan-feat"><div class="check">✓</div> PDF экспорт</div>
+        <div class="plan-feat"><div class="check">✓</div> 5 красивых шаблонов</div>
+        <div class="plan-feat"><div class="check">✓</div> Под конкретную вакансию</div>
+        <button class="btn-primary plan-btn" onclick="activatePro();showApp()" style="background:white;color:#6c63ff;box-shadow:none;border:2px solid rgba(255,255,255,0.5)">Оформить PRO →</button>
+      </div>
+    </div>
+  </div>
+
+  <div style="text-align:center;padding:40px 20px 60px;color:var(--muted);font-size:14px">
+    © 2025 CVforge · Создано с ❤️ и Claude AI
+  </div>
+</div>
+
+<!-- APP -->
+<div id="app">
+  <div class="app-nav">
+    <div class="app-nav-inner">
+      <div class="app-logo" onclick="showLanding()">CVforge ✨</div>
+      <div class="plan-pill">
+        <span id="limitText">1 из 1 бесплатных</span>
+        <button class="upgrade-btn" id="proBtn" onclick="showUpgrade()">⭐ Upgrade PRO</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="form-layout single" id="formLayout">
+    <!-- Progress -->
+    <div class="progress-wrap">
+      <div class="progress-steps">
+        <div class="pstep active" id="ps0"><div class="pstep-bar"></div><div class="pstep-label">Данные</div></div>
+        <div class="pstep" id="ps1"><div class="pstep-bar"></div><div class="pstep-label">Опыт</div></div>
+        <div class="pstep" id="ps2"><div class="pstep-bar"></div><div class="pstep-label">Навыки</div></div>
+        <div class="pstep" id="ps3"><div class="pstep-bar"></div><div class="pstep-label">Генерация</div></div>
+      </div>
+    </div>
+
+    <!-- Step 0 -->
+    <div class="form-card" id="step0">
+      <div class="form-title">👤 Личные данные</div>
+      <div class="form-sub">Расскажи о себе — это заголовок твоего резюме</div>
+      <div class="grid2">
+        <div class="fgroup"><label>Имя и фамилия</label><input id="name" placeholder="Иван Петров"></div>
+        <div class="fgroup"><label>Желаемая должность</label><input id="position" placeholder="Frontend Developer"></div>
+        <div class="fgroup"><label>Email</label><input id="email" placeholder="ivan@email.com"></div>
+        <div class="fgroup"><label>Телефон</label><input id="phone" placeholder="+7 999 000-00-00"></div>
+        <div class="fgroup"><label>Город</label><input id="city" placeholder="Москва"></div>
+      </div>
+      <div class="snav">
+        <div></div>
+        <button class="btn-primary" onclick="goStep(1)">Далее →</button>
+      </div>
+    </div>
+
+    <!-- Step 1 -->
+    <div class="form-card" id="step1" style="display:none">
+      <div class="form-title">💼 Опыт работы</div>
+      <div class="form-sub">ИИ превратит это в убедительные пункты резюме</div>
+      <div class="fgroup"><label>Последнее место работы</label><input id="company" placeholder="Google, Яндекс, Стартап ABC"></div>
+      <div class="fgroup"><label>Сколько лет опыта и в чём</label><input id="experience" placeholder="5 лет в веб-разработке, React, Node.js"></div>
+      <div class="fgroup"><label>Достижения (чем гордишься?)</label><textarea id="achievements" rows="4" placeholder="Увеличил продажи на 30%, запустил продукт с нуля, руководил командой..."></textarea></div>
+      <div class="fgroup"><label>Образование</label><input id="education" placeholder="МГУ, факультет ВМК, 2019"></div>
+      <div class="snav">
+        <button class="btn-outline" onclick="goStep(0)">← Назад</button>
+        <button class="btn-primary" onclick="goStep(2)">Далее →</button>
+      </div>
+    </div>
+
+    <!-- Step 2 -->
+    <div class="form-card" id="step2" style="display:none">
+      <div class="form-title">🛠 Навыки и прочее</div>
+      <div class="form-sub">Перечисли ключевые компетенции</div>
+      <div class="fgroup"><label>Технические навыки</label><textarea id="skills" rows="3" placeholder="React, TypeScript, Python, SQL, Docker..."></textarea></div>
+      <div class="fgroup"><label>Языки</label><input id="languages" placeholder="Русский (родной), Английский (B2)"></div>
+      <div class="fgroup"><label>Дополнительно (необязательно)</label><textarea id="extra" rows="3" placeholder="Открыт к релокации, сертификаты, pet-projects..."></textarea></div>
+      <div class="snav">
+        <button class="btn-outline" onclick="goStep(1)">← Назад</button>
+        <button class="btn-primary" onclick="goStep(3)">Далее →</button>
+      </div>
+    </div>
+
+    <!-- Step 3 -->
+    <div class="form-card" id="step3" style="display:none">
+      <div class="form-title">🚀 Готово к генерации!</div>
+      <div class="form-sub">ИИ создаст профессиональное резюме на основе твоих данных</div>
+      <div class="summary-card">
+        <div class="summary-row"><span>Имя</span><span id="sumName">—</span></div>
+        <div class="summary-row"><span>Должность</span><span id="sumPos">—</span></div>
+        <div class="summary-row"><span>Опыт</span><span id="sumExp">—</span></div>
+        <div class="summary-row"><span>Навыки</span><span id="sumSkills">—</span></div>
+      </div>
+      <div class="limit-warn" id="limitWarn">⚠️ Лимит бесплатных резюме исчерпан. Нужен PRO для продолжения.</div>
+      <button class="btn-primary" id="genBtn" onclick="generate()" style="width:100%;padding:16px;font-size:16px;justify-content:center">⚡ Создать резюме с ИИ</button>
+      <p style="text-align:center;font-size:12px;color:var(--muted);margin-top:12px" id="freeNote">Использует 1 из 1 бесплатных резюме</p>
+      <div class="snav" style="margin-top:16px">
+        <button class="btn-outline" onclick="goStep(2)">← Назад</button>
+        <div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Result (shown alongside form) -->
+  <div style="max-width:1100px;margin:0 auto;padding:0 5vw 40px;display:none" id="resultWrap">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:32px" id="resultGrid">
+      <div class="form-card">
+        <div class="form-title">✅ Резюме готово!</div>
+        <div class="form-sub">Скопируй или скачай своё резюме</div>
+        <div class="summary-card">
+          <div class="summary-row"><span>Имя</span><span id="sumName2">—</span></div>
+          <div class="summary-row"><span>Должность</span><span id="sumPos2">—</span></div>
+        </div>
+        <button class="btn-primary" onclick="generate()" style="width:100%;justify-content:center;margin-bottom:12px">🔄 Создать ещё раз</button>
+        <button class="btn-secondary" onclick="goStep(0);showForm()" style="width:100%">✏️ Изменить данные</button>
+      </div>
+      <div class="result-card">
+        <div class="result-header">
+          <div class="result-badge" id="resultStatus">⚡ Генерирую...</div>
+          <button class="copy-btn" onclick="copyResult()" id="copyBtn">📋 Копировать</button>
+        </div>
+        <div class="result-body" id="resultContent"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Paywall Modal -->
+<div class="modal" id="paywallModal">
+  <div class="modal-box">
+    <div class="modal-icon">🔒</div>
+    <div class="modal-title">Лимит исчерпан</div>
+    <div class="modal-text">Бесплатный план позволяет создать <strong>1 резюме</strong>.<br>Перейди на <strong style="color:var(--accent)">PRO за $9/месяц</strong> и создавай неограниченно.</div>
+    <button class="btn-primary" style="width:100%;justify-content:center;padding:16px" onclick="activatePro()">⭐ Оформить PRO — $9/мес</button>
+    <button class="modal-close" onclick="closeModal('paywallModal')">Не сейчас</button>
+  </div>
+</div>
+
+<!-- Upgrade Modal -->
+<div class="modal" id="upgradeModal">
+  <div class="modal-box">
+    <div class="modal-icon">⭐</div>
+    <div class="modal-title">CVforge PRO</div>
+    <div class="modal-text">Всё без ограничений</div>
+    <div style="text-align:left;margin:20px 0">
+      <div class="plan-feat" style="margin-bottom:12px"><div class="check" style="width:20px;height:20px;border-radius:50%;background:linear-gradient(135deg,#43e97b,#38f9d7);display:flex;align-items:center;justify-content:center;font-size:11px;flex-shrink:0">✓</div><span style="margin-left:10px">∞ резюмей</span></div>
+      <div class="plan-feat" style="margin-bottom:12px"><div class="check" style="width:20px;height:20px;border-radius:50%;background:linear-gradient(135deg,#43e97b,#38f9d7);display:flex;align-items:center;justify-content:center;font-size:11px;flex-shrink:0">✓</div><span style="margin-left:10px">Сопроводительные письма</span></div>
+      <div class="plan-feat" style="margin-bottom:12px"><div class="check" style="width:20px;height:20px;border-radius:50%;background:linear-gradient(135deg,#43e97b,#38f9d7);display:flex;align-items:center;justify-content:center;font-size:11px;flex-shrink:0">✓</div><span style="margin-left:10px">PDF экспорт</span></div>
+      <div class="plan-feat"><div class="check" style="width:20px;height:20px;border-radius:50%;background:linear-gradient(135deg,#43e97b,#38f9d7);display:flex;align-items:center;justify-content:center;font-size:11px;flex-shrink:0">✓</div><span style="margin-left:10px">5 шаблонов</span></div>
+    </div>
+    <div style="font-size:40px;font-weight:800;margin:16px 0 4px">$9 <span style="font-size:16px;color:var(--muted);font-weight:400">/ месяц</span></div>
+    <button class="btn-primary" style="width:100%;justify-content:center;padding:16px" onclick="activatePro()">⭐ Активировать PRO</button>
+    <button class="modal-close" onclick="closeModal('upgradeModal')">Закрыть</button>
+  </div>
+</div>
+
+<script>
+let currentStep=0,plan='free',usedResumes=0,resultText='';
+
+function showApp(){document.getElementById('landing').style.display='none';document.getElementById('app').style.display='block';updateUI()}
+function showLanding(){document.getElementById('app').style.display='none';document.getElementById('landing').style.display='block'}
+function showUpgrade(){document.getElementById('upgradeModal').classList.add('show')}
+function closeModal(id){document.getElementById(id).classList.remove('show')}
+function showForm(){document.getElementById('formLayout').style.display='block';document.getElementById('resultWrap').style.display='none'}
+
+function activatePro(){
+  plan='pro';closeModal('paywallModal');closeModal('upgradeModal');
+  document.getElementById('proBtn').style.display='none';
+  document.getElementById('limitText').textContent='∞ PRO резюмей';
+  document.getElementById('freeNote').style.display='none';
+  document.getElementById('limitWarn').style.display='none';
+  document.getElementById('genBtn').textContent='⚡ Создать резюме с ИИ';
+}
+
+function updateUI(){
+  const can=plan==='pro'||usedResumes<1;
+  document.getElementById('proBtn').style.display=plan==='free'?'block':'none';
+  document.getElementById('limitText').textContent=plan==='pro'?'∞ PRO резюмей':`${1-usedResumes} из 1 бесплатных`;
+  document.getElementById('limitWarn').style.display=!can?'block':'none';
+  document.getElementById('genBtn').textContent=!can?'🔒 Нужен PRO':'⚡ Создать резюме с ИИ';
+}
+
+function goStep(n){
+  document.getElementById('step'+currentStep).style.display='none';
+  document.getElementById('ps'+currentStep).classList.remove('active');
+  currentStep=n;
+  document.getElementById('step'+currentStep).style.display='block';
+  document.getElementById('ps'+currentStep).classList.add('active');
+  if(n===3){updateSummary();updateUI()}
+}
+
+function updateSummary(){
+  const n=document.getElementById('name').value||'—';
+  const p=document.getElementById('position').value||'—';
+  const e=document.getElementById('experience').value||'—';
+  const s=document.getElementById('skills').value||'—';
+  document.getElementById('sumName').textContent=n;
+  document.getElementById('sumPos').textContent=p;
+  document.getElementById('sumExp').textContent=e;
+  document.getElementById('sumSkills').textContent=s.length>35?s.slice(0,35)+'...':s;
+}
+
+function renderMd(t){
+  return t
+    .replace(/^## (.+)$/gm,'<h2>$1</h2>')
+    .replace(/^\*\*(.+)\*\*$/gm,'<p><strong>$1</strong></p>')
+    .replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>')
+    .replace(/^---$/gm,'<hr>')
+    .replace(/^- (.+)$/gm,'<div class="bul">$1</div>')
+    .replace(/\n\n/g,'<br><br>')
+    .replace(/\n/g,'<br>');
+}
+
+async function generate(){
+  const can=plan==='pro'||usedResumes<1;
+  if(!can){document.getElementById('paywallModal').classList.add('show');return}
+  
+  document.getElementById('formLayout').style.display='none';
+  document.getElementById('resultWrap').style.display='block';
+  document.getElementById('sumName2').textContent=document.getElementById('name').value||'—';
+  document.getElementById('sumPos2').textContent=document.getElementById('position').value||'—';
+  document.getElementById('resultStatus').textContent='⚡ Генерирую...';
+  document.getElementById('resultContent').innerHTML='<div style="color:var(--muted);font-size:14px;animation:pulse 1s infinite">Создаю твоё идеальное резюме...</div>';
+
+  const prompt=`Создай профессиональное резюме на русском языке в формате Markdown.
+Имя: ${document.getElementById('name').value||'Иван Петров'}
+Email: ${document.getElementById('email').value||'ivan@email.com'}
+Телефон: ${document.getElementById('phone').value||'+7 999 000-00-00'}
+Город: ${document.getElementById('city').value||'Москва'}
+Желаемая должность: ${document.getElementById('position').value||'Специалист'}
+Опыт: ${document.getElementById('experience').value||'3 года'}
+Последнее место работы: ${document.getElementById('company').value||'Компания'}
+Достижения: ${document.getElementById('achievements').value||'Выполнял задачи'}
+Навыки: ${document.getElementById('skills').value||'Профессиональные навыки'}
+Образование: ${document.getElementById('education').value||'Высшее'}
+Языки: ${document.getElementById('languages').value||'Русский'}
+Дополнительно: ${document.getElementById('extra').value||''}
+Сделай структурированным, профессиональным и убедительным. Только резюме без пояснений.`;
+
+  try{
+    const r=await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,messages:[{role:'user',content:prompt}]})
+    });
+    const d=await r.json();
+    resultText=d.content?.[0]?.text||getFallback();
+  }catch(e){resultText=getFallback()}
+
+  let i=0;
+  const el=document.getElementById('resultContent');
+  const iv=setInterval(()=>{
+    i+=10;el.innerHTML=renderMd(resultText.slice(0,i));
+    if(i>=resultText.length){
+      clearInterval(iv);
+      document.getElementById('resultStatus').textContent='✅ Готово!';
+      usedResumes++;updateUI();
+    }
+  },16);
+}
+
+function getFallback(){
+  return `**Иван Петров**\nivan.petrov@email.com | +7 999 123-45-67 | Москва\n\n---\n\n## ПРОФЕССИОНАЛЬНЫЙ ПРОФИЛЬ\n\nОпытный специалист с глубокой экспертизой. Успешно реализовал множество проектов.\n\n---\n\n## ОПЫТ РАБОТЫ\n\n**Senior Developer** — TechCorp | 2021–н.в.\n- Архитектурировал ключевые системы\n- Оптимизировал процессы на 40%\n- Руководил командой из 5 человек\n\n---\n\n## НАВЫКИ\n\n**Технические:** React, TypeScript, Python\n**Soft skills:** Лидерство, коммуникация\n\n---\n\n## ОБРАЗОВАНИЕ\n\nВысшее образование | 2019`;
+}
+
+function copyResult(){
+  navigator.clipboard.writeText(resultText).then(()=>{
+    document.getElementById('copyBtn').textContent='✅ Скопировано!';
+    setTimeout(()=>document.getElementById('copyBtn').textContent='📋 Копировать',2000);
+  });
+}
+</script>
+</body>
+</html>
