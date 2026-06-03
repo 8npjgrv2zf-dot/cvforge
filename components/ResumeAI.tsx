@@ -1,4 +1,6 @@
-import { useState, useEffect, useRef } from "react";
+"use client";
+
+import { useState, useRef } from "react";
 
 const PLANS = {
   free: { resumes: 1, coverLetters: 0, label: "Free" },
@@ -49,14 +51,13 @@ export default function ResumeAI() {
   const [usedResumes, setUsedResumes] = useState(0);
   const [step, setStep] = useState("landing");
   const [formStep, setFormStep] = useState(0);
-  const [loading, setLoading] = useState(false);
-  const [result, setResult] = useState(null);
+  const [result, setResult] = useState<string | null>(null);
   const [showPaywall, setShowPaywall] = useState(false);
   const [showUpgrade, setShowUpgrade] = useState(false);
   const [generating, setGenerating] = useState(false);
   const [streamText, setStreamText] = useState("");
   const [copied, setCopied] = useState(false);
-  const outputRef = useRef(null);
+  const outputRef = useRef<HTMLDivElement>(null);
 
   const [form, setForm] = useState({
     name: "",
@@ -75,8 +76,20 @@ export default function ResumeAI() {
 
   const canGenerate = plan === "pro" || usedResumes < PLANS.free.resumes;
 
-  function updateForm(k, v) {
+  function updateForm(k: string, v: string) {
     setForm((f) => ({ ...f, [k]: v }));
+  }
+
+  function animateText(text: string, onDone: () => void) {
+    let i = 0;
+    const interval = setInterval(() => {
+      i += 8;
+      setStreamText(text.slice(0, i));
+      if (i >= text.length) {
+        clearInterval(interval);
+        onDone();
+      }
+    }, 16);
   }
 
   async function generateResume() {
@@ -107,43 +120,24 @@ export default function ResumeAI() {
 Сделай резюме структурированным, профессиональным и убедительным. Используй разделы: профессиональный профиль, опыт работы, навыки, образование. Напиши конкретно и ёмко. Только резюме, без пояснений.`;
 
     try {
-      const response = await fetch("https://api.anthropic.com/v1/messages", {
+      const response = await fetch("/api/generate-resume", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          model: "claude-sonnet-4-20250514",
-          max_tokens: 1000,
-          messages: [{ role: "user", content: prompt }],
-        }),
+        body: JSON.stringify({ prompt }),
       });
       const data = await response.json();
-      const text = data.content?.[0]?.text || MOCK_RESUME;
-
-      // Animate text reveal
-      let i = 0;
-      const interval = setInterval(() => {
-        i += 8;
-        setStreamText(text.slice(0, i));
-        if (i >= text.length) {
-          clearInterval(interval);
-          setResult(text);
-          setUsedResumes((u) => u + 1);
-        }
-      }, 16);
-    } catch (e) {
-      // Demo fallback
-      let i = 0;
-      const interval = setInterval(() => {
-        i += 8;
-        setStreamText(MOCK_RESUME.slice(0, i));
-        if (i >= MOCK_RESUME.length) {
-          clearInterval(interval);
-          setResult(MOCK_RESUME);
-          setUsedResumes((u) => u + 1);
-        }
-      }, 16);
-    } finally {
-      setGenerating(false);
+      const text = data.text || MOCK_RESUME;
+      animateText(text, () => {
+        setResult(text);
+        setUsedResumes((u) => u + 1);
+        setGenerating(false);
+      });
+    } catch {
+      animateText(MOCK_RESUME, () => {
+        setResult(MOCK_RESUME);
+        setUsedResumes((u) => u + 1);
+        setGenerating(false);
+      });
     }
   }
 
@@ -153,7 +147,7 @@ export default function ResumeAI() {
     setTimeout(() => setCopied(false), 2000);
   }
 
-  const renderMarkdown = (text) => {
+  const renderMarkdown = (text: string) => {
     return text
       .replace(/^## (.+)$/gm, '<h2 style="color:#c8ff00;font-size:13px;letter-spacing:0.15em;text-transform:uppercase;margin:20px 0 8px;font-family:\'Space Mono\',monospace">$1</h2>')
       .replace(/^\*\*(.+)\*\*$/gm, '<p style="font-weight:700;color:#fff;margin:4px 0">$1</p>')
@@ -286,8 +280,6 @@ export default function ResumeAI() {
   }
 
   // App view
-  const currentStepIndex = STEPS.indexOf("generate") >= 0 ? formStep : 0;
-
   return (
     <div style={{
       minHeight: "100vh",
@@ -375,16 +367,16 @@ export default function ResumeAI() {
             <h2 style={{ fontSize: 24, fontWeight: 700, marginBottom: 8 }}>Личные данные</h2>
             <p style={{ color: "#555", fontSize: 14, marginBottom: 32 }}>Расскажи о себе — это заголовок твоего резюме</p>
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
-              {([
+              {[
                 ["name", "Имя и фамилия", "Иван Петров", false],
                 ["position", "Желаемая должность", "Frontend Developer", false],
                 ["email", "Email", "ivan@email.com", false],
                 ["phone", "Телефон", "+7 999 000-00-00", false],
                 ["city", "Город", "Москва", false],
-              ] as [string, string, string, boolean][]).map(([k, label, ph, full]) => (
-                <div key={k} style={{ gridColumn: full ? "1/-1" : "auto" }}>
-                  <label style={{ display: "block", fontSize: 11, color: "#555", fontFamily: "'Space Mono',monospace", letterSpacing: "0.1em", marginBottom: 8 }}>{label.toUpperCase()}</label>
-                  <input className="input-field" placeholder={ph} value={form[k]} onChange={e => updateForm(k, e.target.value)} />
+              ].map(([k, label, ph, full]) => (
+                <div key={k as string} style={{ gridColumn: full ? "1/-1" : "auto" }}>
+                  <label style={{ display: "block", fontSize: 11, color: "#555", fontFamily: "'Space Mono',monospace", letterSpacing: "0.1em", marginBottom: 8 }}>{(label as string).toUpperCase()}</label>
+                  <input className="input-field" placeholder={ph as string} value={(form as any)[k as string]} onChange={e => updateForm(k as string, e.target.value)} />
                 </div>
               ))}
             </div>
@@ -403,7 +395,7 @@ export default function ResumeAI() {
               ].map(([k, label, ph]) => (
                 <div key={k}>
                   <label style={{ display: "block", fontSize: 11, color: "#555", fontFamily: "'Space Mono',monospace", letterSpacing: "0.1em", marginBottom: 8 }}>{label.toUpperCase()}</label>
-                  <input className="input-field" placeholder={ph} value={form[k]} onChange={e => updateForm(k, e.target.value)} />
+                  <input className="input-field" placeholder={ph} value={(form as any)[k]} onChange={e => updateForm(k, e.target.value)} />
                 </div>
               ))}
               <div>
